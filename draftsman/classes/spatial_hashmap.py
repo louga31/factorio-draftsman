@@ -8,6 +8,7 @@ from draftsman.classes.spatiallike import SpatialLike
 from draftsman.classes.spatial_data_structure import SpatialDataStructure
 from draftsman.prototypes.straight_rail import StraightRail
 from draftsman.prototypes.curved_rail import CurvedRail
+from draftsman.prototypes.gate import Gate
 from draftsman import utils
 from draftsman.warning import OverlappingObjectsWarning
 
@@ -138,6 +139,15 @@ class SpatialHashMap(SpatialDataStructure):
                     )
                     if not identical:
                         continue
+
+                # Gates on rails are also weird, so we fix them here
+                if (
+                    isinstance(item, (StraightRail, CurvedRail))
+                    and isinstance(overlapping_item, Gate)
+                    or isinstance(item, Gate)
+                    and isinstance(overlapping_item, (StraightRail, CurvedRail))
+                ):
+                    continue
 
                 if len(other_layers.intersection(item_layers)) > 0:
                     warnings.warn(

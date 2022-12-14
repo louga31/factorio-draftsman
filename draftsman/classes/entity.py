@@ -101,15 +101,10 @@ class Entity(EntityLike):
             )
 
         # Collision mask (Internal)
-        if "collision_mask" in entities.raw[self.name]:
-            self._collision_mask = set(entities.raw[self.name]["collision_mask"])
-        else:  # Base default
-            self._collision_mask = {
-                "item-layer",
-                "object-layer",
-                "player-layer",
-                "water-tile",
-            }
+        # We guarantee that the "collision_mask" key will exist during 
+        # `draftsman-update`, and that it will have it's proper default based
+        # on it's type
+        self._collision_mask = entities.raw[self.name]["collision_mask"]
 
         # Tile Width and Height (Internal)
         # Usually tile dimensions are implicitly based on the collision box
@@ -153,23 +148,26 @@ class Entity(EntityLike):
         """
         The name of the entity. Must be a valid Factorio ID string. Read only.
 
+        TODO: How to make this changable, or alert the user of it's danger?
+
         :type: ``str``
         """
         return self._name
 
-    # @name.setter
-    # def name(self, value):
-    #     # type: (str) -> None
-    #     if self.parent:
-    #         raise DraftsmanError(
-    #             "Cannot change name of entity while in another collection"
-    #         )
+    @name.setter
+    def name(self, value):
+        # type: (str) -> None
+        if self.parent:
+            raise DraftsmanError(
+                "Cannot change name of entity while in another collection"
+            )
 
-    #     if value in self.similar_entities:
-    #         self._name = value
-    #     else:
-    #         raise InvalidEntityError("'{}' is not a valid name for this type"
-    #                                  .format(value))
+        if value in self.similar_entities:
+            self._name = value
+        else:
+            raise InvalidEntityError(
+                "'{}' is not a valid name for this type".format(value)
+            )
 
     # =========================================================================
 
@@ -358,22 +356,6 @@ class Entity(EntityLike):
 
     # =========================================================================
 
-    # @property
-    # def collision_box(self):
-    #     # type: () -> list
-    #     """
-    #     The AABB that stores the collision area of the Entity. Equivalent to
-    #     the one specified in Factorio's ``data.raw``. Not exported; read only.
-
-    #     The ``collision_box`` treats the Entity's position as the origin. This
-    #     means that it is position independent, and equivalent for all entities
-    #     with the same name. If you want to know the area the Entity occupies in
-    #     world-space, you can use :py:meth:`get_area` instead.
-
-    #     :type: ``[[float, float], [float, float]]``
-    #     """
-    #     return self._collision_box
-
     @property
     def collision_set(self):
         # type: () -> CollisionSet
@@ -529,6 +511,11 @@ class Entity(EntityLike):
                 out[k] = v
 
         return out
+
+    def inspect(self):
+        # type: () -> list[Exception]
+
+        pass  # TODO
 
     def mergable_with(self, other):
         # type: (Entity) -> bool
@@ -700,7 +687,7 @@ class Entity(EntityLike):
             " '{}'".format(self.id) if self.id is not None else "",
             str(self.to_dict()),
         )
-        # Association debug printing
+        # Association debug printing:
         # return "<{0}{1} at 0x{2:016X}>{3}".format(
         #     type(self).__name__,
         #     " '{}'".format(self.id) if self.id is not None else "",
