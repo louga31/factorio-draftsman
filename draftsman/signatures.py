@@ -245,7 +245,7 @@ PARAMETERS = Schema(
     And(
         Use(lambda x: {} if x is None else x),
         {
-            Optional("playback_volume"): float,
+            Optional("playback_volume"): Use(float),
             Optional("playback_globally"): bool,
             Optional("allow_polyphony"): bool,
         },
@@ -442,6 +442,7 @@ LAMP_CONTROL_BEHAVIOR = Schema(
         Use(lambda x: {} if x is None else x),  # Convert to empty dict if None
         {
             Optional("circuit_condition"): CONDITION,
+            Optional("logistic_condition"): CONDITION,
             Optional("use_colors"): bool,
         },
     )

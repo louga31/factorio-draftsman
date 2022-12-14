@@ -8,6 +8,7 @@ from draftsman.error import InvalidEntityError, DataFormatError
 from draftsman.warning import DraftsmanWarning
 
 import sys
+import pytest
 
 if sys.version_info >= (3, 3):  # pragma: no coverage
     import unittest
@@ -24,32 +25,29 @@ class ConstantCombinatorTesting(unittest.TestCase):
                 "filters": [("signal-A", 100), ("signal-B", 200), ("signal-C", 300)]
             },
         )
-        self.assertEqual(
-            combinator.to_dict(),
-            {
-                "name": "constant-combinator",
-                "position": {"x": 0.5, "y": 2.5},
-                "control_behavior": {
-                    "filters": [
-                        {
-                            "index": 1,
-                            "signal": {"name": "signal-A", "type": "virtual"},
-                            "count": 100,
-                        },
-                        {
-                            "index": 2,
-                            "signal": {"name": "signal-B", "type": "virtual"},
-                            "count": 200,
-                        },
-                        {
-                            "index": 3,
-                            "signal": {"name": "signal-C", "type": "virtual"},
-                            "count": 300,
-                        },
-                    ]
-                },
+        assert combinator.to_dict() == {
+            "name": "constant-combinator",
+            "position": {"x": 0.5, "y": 2.5},
+            "control_behavior": {
+                "filters": [
+                    {
+                        "index": 1,
+                        "signal": {"name": "signal-A", "type": "virtual"},
+                        "count": 100,
+                    },
+                    {
+                        "index": 2,
+                        "signal": {"name": "signal-B", "type": "virtual"},
+                        "count": 200,
+                    },
+                    {
+                        "index": 3,
+                        "signal": {"name": "signal-C", "type": "virtual"},
+                        "count": 300,
+                    },
+                ]
             },
-        )
+        }
 
         combinator = ConstantCombinator(
             "constant-combinator",
@@ -70,136 +68,137 @@ class ConstantCombinatorTesting(unittest.TestCase):
                 ]
             },
         )
-        self.assertEqual(
-            combinator.to_dict(),
-            {
-                "name": "constant-combinator",
-                "position": {"x": 0.5, "y": 2.5},
-                "control_behavior": {
-                    "filters": [
-                        {
-                            "index": 1,
-                            "signal": {"name": "signal-A", "type": "virtual"},
-                            "count": 100,
-                        },
-                        {
-                            "index": 2,
-                            "signal": {"name": "signal-B", "type": "virtual"},
-                            "count": 200,
-                        },
-                        {
-                            "index": 3,
-                            "signal": {"name": "signal-C", "type": "virtual"},
-                            "count": 300,
-                        },
-                    ]
-                },
+        assert combinator.to_dict() == {
+            "name": "constant-combinator",
+            "position": {"x": 0.5, "y": 2.5},
+            "control_behavior": {
+                "filters": [
+                    {
+                        "index": 1,
+                        "signal": {"name": "signal-A", "type": "virtual"},
+                        "count": 100,
+                    },
+                    {
+                        "index": 2,
+                        "signal": {"name": "signal-B", "type": "virtual"},
+                        "count": 200,
+                    },
+                    {
+                        "index": 3,
+                        "signal": {"name": "signal-C", "type": "virtual"},
+                        "count": 300,
+                    },
+                ]
             },
-        )
+        }
 
         # Warnings
-        with self.assertWarns(DraftsmanWarning):
+        with pytest.warns(DraftsmanWarning):
             ConstantCombinator(unused_keyword="whatever")
 
         # Errors
-        with self.assertRaises(InvalidEntityError):
+        with pytest.raises(InvalidEntityError):
             ConstantCombinator("this is not a constant combinator")
-        with self.assertRaises(DataFormatError):
+        with pytest.raises(DataFormatError):
             ConstantCombinator(control_behavior={"unused_key": "something"})
 
     def test_flags(self):
         for name in constant_combinators:
             combinator = ConstantCombinator(name)
-            self.assertEqual(combinator.power_connectable, False)
-            self.assertEqual(combinator.dual_power_connectable, False)
-            self.assertEqual(combinator.circuit_connectable, True)
-            self.assertEqual(combinator.dual_circuit_connectable, False)
+            assert combinator.power_connectable == False
+            assert combinator.dual_power_connectable == False
+            assert combinator.circuit_connectable == True
+            assert combinator.dual_circuit_connectable == False
 
     def test_item_slot_count(self):
         combinator = ConstantCombinator()
-        self.assertEqual(combinator.item_slot_count, 20)
+        assert combinator.item_slot_count == 20
 
     def test_set_signal(self):
         combinator = ConstantCombinator()
         combinator.set_signal(0, "signal-A", 100)
-        self.assertEqual(
-            combinator.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-A", "type": "virtual"},
-                        "count": 100,
-                    }
-                ]
-            },
-        )
+        assert combinator.control_behavior == {
+            "filters": [
+                {
+                    "index": 1,
+                    "signal": {"name": "signal-A", "type": "virtual"},
+                    "count": 100,
+                }
+            ]
+        }
         combinator.set_signal(1, "signal-B", 200)
-        self.assertEqual(
-            combinator.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-A", "type": "virtual"},
-                        "count": 100,
-                    },
-                    {
-                        "index": 2,
-                        "signal": {"name": "signal-B", "type": "virtual"},
-                        "count": 200,
-                    },
-                ]
-            },
-        )
+        assert combinator.control_behavior == {
+            "filters": [
+                {
+                    "index": 1,
+                    "signal": {"name": "signal-A", "type": "virtual"},
+                    "count": 100,
+                },
+                {
+                    "index": 2,
+                    "signal": {"name": "signal-B", "type": "virtual"},
+                    "count": 200,
+                },
+            ]
+        }
         combinator.set_signal(0, "signal-C", 300)
-        self.assertEqual(
-            combinator.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-C", "type": "virtual"},
-                        "count": 300,
-                    },
-                    {
-                        "index": 2,
-                        "signal": {"name": "signal-B", "type": "virtual"},
-                        "count": 200,
-                    },
-                ]
-            },
-        )
+        assert combinator.control_behavior == {
+            "filters": [
+                {
+                    "index": 1,
+                    "signal": {"name": "signal-C", "type": "virtual"},
+                    "count": 300,
+                },
+                {
+                    "index": 2,
+                    "signal": {"name": "signal-B", "type": "virtual"},
+                    "count": 200,
+                },
+            ]
+        }
         combinator.set_signal(1, None)
-        self.assertEqual(
-            combinator.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-C", "type": "virtual"},
-                        "count": 300,
-                    }
-                ]
-            },
-        )
+        assert combinator.control_behavior == {
+            "filters": [
+                {
+                    "index": 1,
+                    "signal": {"name": "signal-C", "type": "virtual"},
+                    "count": 300,
+                }
+            ]
+        }
 
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             combinator.set_signal(TypeError, "something")
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             combinator.set_signal(1, TypeError)
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             combinator.set_signal(1, "iron-ore", TypeError)
-        with self.assertRaises(IndexError):
+        with pytest.raises(IndexError):
             combinator.set_signal(-1, "iron-ore", 0)
 
     def test_set_signals(self):
         combinator = ConstantCombinator()
         # Test user format
         combinator.signals = [("signal-A", 100), ("signal-Z", 200), ("iron-ore", 1000)]
-        self.assertEqual(
-            combinator.signals,
-            [
+        assert combinator.signals == [
+            {
+                "index": 1,
+                "signal": {"name": "signal-A", "type": "virtual"},
+                "count": 100,
+            },
+            {
+                "index": 2,
+                "signal": {"name": "signal-Z", "type": "virtual"},
+                "count": 200,
+            },
+            {
+                "index": 3,
+                "signal": {"name": "iron-ore", "type": "item"},
+                "count": 1000,
+            },
+        ]
+        assert combinator.control_behavior == {
+            "filters": [
                 {
                     "index": 1,
                     "signal": {"name": "signal-A", "type": "virtual"},
@@ -215,30 +214,8 @@ class ConstantCombinatorTesting(unittest.TestCase):
                     "signal": {"name": "iron-ore", "type": "item"},
                     "count": 1000,
                 },
-            ],
-        )
-        self.assertEqual(
-            combinator.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-A", "type": "virtual"},
-                        "count": 100,
-                    },
-                    {
-                        "index": 2,
-                        "signal": {"name": "signal-Z", "type": "virtual"},
-                        "count": 200,
-                    },
-                    {
-                        "index": 3,
-                        "signal": {"name": "iron-ore", "type": "item"},
-                        "count": 1000,
-                    },
-                ]
-            },
-        )
+            ]
+        }
 
         # Test internal format
         combinator.signals = [
@@ -254,60 +231,54 @@ class ConstantCombinatorTesting(unittest.TestCase):
                 "count": 1000,
             },
         ]
-        self.assertEqual(
-            combinator.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-A", "type": "virtual"},
-                        "count": 100,
-                    },
-                    {
-                        "index": 2,
-                        "signal": {"name": "signal-Z", "type": "virtual"},
-                        "count": 200,
-                    },
-                    {
-                        "index": 3,
-                        "signal": {"name": "iron-ore", "type": "item"},
-                        "count": 1000,
-                    },
-                ]
-            },
-        )
+        assert combinator.control_behavior == {
+            "filters": [
+                {
+                    "index": 1,
+                    "signal": {"name": "signal-A", "type": "virtual"},
+                    "count": 100,
+                },
+                {
+                    "index": 2,
+                    "signal": {"name": "signal-Z", "type": "virtual"},
+                    "count": 200,
+                },
+                {
+                    "index": 3,
+                    "signal": {"name": "iron-ore", "type": "item"},
+                    "count": 1000,
+                },
+            ]
+        }
 
         # Test clear signals
         combinator.signals = None
-        self.assertEqual(combinator.control_behavior, {})
+        assert combinator.control_behavior == {}
 
         # Test setting to pure virtual raises Warnings
-        with self.assertWarns(DraftsmanWarning):
+        with pytest.warns(DraftsmanWarning):
             combinator.signals = [("signal-everything", 1)]
-        with self.assertWarns(DraftsmanWarning):
+        with pytest.warns(DraftsmanWarning):
             combinator.signals = [("signal-anything", 1)]
-        with self.assertWarns(DraftsmanWarning):
+        with pytest.warns(DraftsmanWarning):
             combinator.signals = [("signal-each", 1)]
 
-        with self.assertRaises(DataFormatError):
+        with pytest.raises(DataFormatError):
             combinator.signals = {"something", "wrong"}
 
     def test_get_signal(self):
         combinator = ConstantCombinator()
         signal = combinator.get_signal(0)
-        self.assertEqual(signal, None)
+        assert signal == None
         combinator.signals = [("signal-A", 100), ("signal-Z", 200), ("iron-ore", 1000)]
         signal = combinator.get_signal(0)
-        self.assertEqual(
-            signal,
-            {
-                "index": 1,
-                "signal": {"name": "signal-A", "type": "virtual"},
-                "count": 100,
-            },
-        )
+        assert signal == {
+            "index": 1,
+            "signal": {"name": "signal-A", "type": "virtual"},
+            "count": 100,
+        }
         signal = combinator.get_signal(50)
-        self.assertEqual(signal, None)
+        assert signal == None
 
     def test_mergable_with(self):
         comb1 = ConstantCombinator("constant-combinator")
@@ -324,11 +295,11 @@ class ConstantCombinatorTesting(unittest.TestCase):
             },
         )
 
-        self.assertTrue(comb1.mergable_with(comb2))
-        self.assertTrue(comb2.mergable_with(comb1))
+        assert comb1.mergable_with(comb2)
+        assert comb2.mergable_with(comb1)
 
         comb2.tile_position = (1, 1)
-        self.assertFalse(comb1.mergable_with(comb2))
+        assert not comb1.mergable_with(comb2)
 
     def test_merge(self):
         comb1 = ConstantCombinator("constant-combinator")
@@ -348,15 +319,12 @@ class ConstantCombinatorTesting(unittest.TestCase):
         comb1.merge(comb2)
         del comb2
 
-        self.assertEqual(
-            comb1.control_behavior,
-            {
-                "filters": [
-                    {
-                        "index": 1,
-                        "signal": {"name": "signal-A", "type": "virtual"},
-                        "count": 100,
-                    }
-                ]
-            },
-        )
+        assert comb1.control_behavior == {
+            "filters": [
+                {
+                    "index": 1,
+                    "signal": {"name": "signal-A", "type": "virtual"},
+                    "count": 100,
+                }
+            ]
+        }
