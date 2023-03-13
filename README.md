@@ -142,6 +142,7 @@ Both `mod-info.json` and `mod-settings.dat` are recognized by `draftsman-update`
 * Add constraints on `UpgradePlanner` and `DeconstructionPlanner`
 * `Blueprint.schedules` convenience functions
 * More doctests
+* Change type annotations on all functions to follow py3
 * Add plaintext representations of Entity JSON objects for all entities in addition to blueprintables
 * Update modding documentation guide to reflect 2.0 changes
 * Add warnings for placement constraints on rails, rail signals and train stops
