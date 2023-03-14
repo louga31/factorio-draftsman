@@ -653,7 +653,7 @@ def extract_entities(lua, data_location, verbose, sort_tuple):
     def categorize_entities(entity_table, target_list):
         entity_dict = convert_table_to_dict(entity_table)
         for entity_name, entity in entity_dict.items():
-            flags = entity.get("flags", {})  # Flags are common, but optional
+            flags = entity.get("flags", set())
             if (
                 "not-blueprintable" in flags or "not-deconstructable" in flags
             ):  # or "hidden" in flags
